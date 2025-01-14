@@ -1,0 +1,370 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>竖向编辑背景与文本框示例</title>
+    <style>
+        /* 设置渐变背景 */
+    /* 设置渐变背景 */
+    body {
+        margin: 0;
+        height: 100vh;
+        background: linear-gradient(to bottom, pink, lightblue);
+        font-family: Arial, sans-serif;
+        overflow-y: hidden; /* 防止垂直方向的滚动条 */
+        overflow-x: hidden; /* 防止水平方向的滚动条 */
+        position: relative;
+        display: flex;
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+    }
+    
+    .textbox-container {
+        width: 80%;
+        height: 80%;
+        position: relative;
+        display: flex;
+        flex-direction: column; /* 保持竖向排列 */
+        justify-content: flex-start; /* 内容顶部对齐 */
+        align-items: center;
+        overflow-y: auto; /* 使内容可以竖向滚动 */
+        overflow-x: hidden; /* 防止水平滚动 */
+    }
+
+/* 文本框 */
+.textbox {
+    width: 90%; /* 增大文本框宽度 */
+    height: auto; /* 自适应高度 */
+    padding: 20px;
+    border: 2px solid rgba(0, 0, 0, 0.2); /* 添加边框使文本框更突出 */
+    border-radius: 10px;
+    background-color: transparent; /* 设置文本框背景透明 */
+    font-size: 28px; /* 增大文本框字体 */
+    color: black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left; /* 调整为左对齐 */
+    display: flex;
+    flex-direction: column; /* 改为竖向排列 */
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: relative;
+    overflow: visible; /* 确保内容不被截断 */
+}
+
+/* 翻页按钮容器 */
+.arrow-btn-container {
+    display: flex;
+    justify-content: center;  /* 水平居中按钮 */
+    width: 100%;  /* 宽度为 100% */
+    margin-top: 20px;  /* 给按钮添加一些间距 */
+    position: absolute;
+    top: 10%; /* 按钮位置距离顶部10% */
+    left: 5%; /* 按钮位置距离左边5% */
+    z-index: 10;  /* 确保按钮显示在其他内容之上 */
+}
+
+/* 翻页按钮样式 */
+.arrow-btn {
+    font-size: 30px;  /* 增大字体大小 */
+    background-color: rgba(0, 0, 0, 0.7);  /* 背景颜色为半透明黑色 */
+    color: white;  /* 白色文字 */
+    border: none;
+    padding: 15px 30px;  /* 增加按钮大小 */
+    cursor: pointer;
+    border-radius: 50px;  /* 圆角按钮 */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);  /* 添加阴影效果 */
+    transition: background-color 0.3s ease;  /* 背景颜色过渡效果 */
+}
+
+/* 按钮悬停效果 */
+.arrow-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);  /* 悬停时背景颜色变深 */
+}
+
+/* 滚动区域效果 */
+.snowflake {
+    position: absolute;
+    background-color: white; /* 修改为白色雪花 */
+    width: 10px; /* 调整为较大雪花 */
+    height: 10px; /* 调整为较大雪花 */
+    border-radius: 50%;
+    animation: fall 5s linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0); /* 从文本框顶部开始 */
+    }
+    100% {
+        transform: translateY(100vh); /* 向下方下落 */
+    }
+}
+
+h1 {
+    font-size: 50px; /* 设置较小的标题字体 */
+    margin: 0; /* 去除默认外边距 */
+}
+
+p {
+    font-family: 楷体;
+    text-indent: 2em;
+}
+
+        /* 翻页按钮容器 */
+        .arrow-btn-container {
+            display: flex;
+            justify-content: center;  /* 水平居中按钮 */
+            width: 100%;  /* 宽度为 100% */
+            margin-top: 20px;  /* 给按钮添加一些间距 */
+        }
+
+        /* 给按钮添加适当间距 */
+        .arrow-btn-left {
+            margin-right: 10px; /* 左箭头按钮右侧间距 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 文本框容器 -->
+    <div class="textbox-container">
+        <!-- 翻页按钮容器（放在文本框前面） -->
+        <div class="arrow-btn-container">
+            <!-- 上一页按钮 -->
+            <button class="arrow-btn arrow-btn-left" onclick="previousPage()">上一页</button>
+
+            <!-- 下一页按钮 -->
+            <button class="arrow-btn arrow-btn-right" onclick="nextPage()">下一页</button>
+        </div>
+
+        <!-- 文本框 -->
+        <div class="textbox" id="textbox">
+            <!-- 动态生成内容 -->
+        </div>
+    </div>
+
+    <!-- 雪花效果 -->
+    <div id="snowflakes"></div>
+</body>
+
+    <!-- 雪花效果 -->
+    <div id="snowflakes"></div>
+
+    <script>
+        // 页面的内容数组，每个段落和它对应的图片
+        const pages = [
+            {
+                title: "2021",
+                content: [
+                    { text: "<p>2021 10 11" },
+                    { text: "<p>你表白了，我没有同意，并留下了“只要你坚持我迟早是你的”。</p>" },
+                    { text: "<p>2021 10 18</p>" },
+                    {text :"<p>我们在一起了，这是我们在一起的第一天，我们在艺体馆舞蹈室外的楼梯上，我跟你说出了“我们在一起吧”。</p>"},
+                    {text:"<p>2021 10 24</p>"},
+                    {text:"<p>我们官宣了,有好多人祝福我们啊</p>",image:"image\\1 (61).jpg"},
+                    {text :"<p>2021 10 30</p>"},
+                    {text:"<p>   这是我们第一张照片，我还记得初二的时候我说过，我以后一定要牵着我女朋友的手来龟山公园，今天我做到了。</p>" ,image:"image\\1 (8).jpg" },
+                    {text:"<p>2021 11 18</p>"},
+                    {text:"<p>九中运动会开始了，我们一起站岗谈恋爱（还因为某人被狠狠公知了）好怀恋这个时候啊…</p>",image:"image\\1 (56).jpg"},
+                    {text:"<p>2021 11 19</p>"},
+                    {text:"<p>运动会结束了，我和你在六楼拍下来这张照片。<p>",image:"image\\1 (55).jpg"},
+                    {text:"<p>2021 11 29</p>"},
+                    {text:"<p>某一天的晚自习，我亲手给你编的辫子，你觉得难看，可是我觉得只要是你什么都好看。<p>",image:"image\\1 (54).jpg"},
+                    { text: "<p></p>", image: "image\\1 (28).jpg" } ,
+                    {text:"<p>2021 12 17</p>"},
+                    {text:"<p>你的生日过了一天，你的生日礼物我还有一部分没有完成，我在选礼物的时候真的好纠结啊，第一次送你礼物不知道送什么合适</p>",image:"image\\1 (27).jpg"},
+                    {text:"<p>2021 12 25</p>"},
+                    {text:"<p>  你为我画的第一颗圣诞树，画的我很喜欢</p>",image:"image\\1 (52).jpg"},
+                ]
+            },
+            {
+                title: "2022",
+                content: [
+                    { text: "<p>2022 3 6</p>"},
+                    { text: "<p>你为我做的第一顿饭，真的好好吃，我想带的学校吃，因为我想狠狠的炫耀我女朋友做饭是如此好吃，但是因为我带去九中太麻烦，你没有让(真的好好吃)</p>", image: "image\\1 (26).jpg" },
+                    {text:"<p>2022 4 4</p>"},
+                    {text:"<p>社团嘉年华要用的墨镜到了，带着口罩和墨镜，我终于有勇气出镜了</p>",image: "image\\1 (6).jpg"},
+                    {text:"<p></p>",image: "image\\1 (7).jpg"},
+                    {text:"<p>2022 4 5</p>"},
+                    {text:"<p>那天我们一起去了龟山公园</p>"},
+                    {text:"<p>你在拍风景，我在拍你（你嫌我拍的不好看）</p>",image:"image\\1 (58).jpg"},
+                    {text:"<p>这张也好好看</p>",image:"image\\1 (57).jpg"},
+                    {text:"<p></p>",image:"image\\1 (51).jpg"},
+                    {text:"<p>2022 4 12</p>"},
+                    {text:"<p>这张是你拍的，并且非常磕这张照片</p>",image:"image\\1 (46).jpg"},
+                    {text:"<p>2022 4 17</p>"},
+                    {text:"<p>送你的第一束花</p>",image:"image\\1 (25).jpg"},
+                    {text:"<p>2022 4 29</p>"},
+                    {text:"<p>每次傍晚和你一起走的时候都可以在坡这里见到这样的美景，真的好幸福啊</p>",image:"image\\1 (59).jpg"},
+                    {text:"<p>2022 5 1</p>"},
+                    {text:"<p>那天我们一起去龟山公园拍高考祝福视频了，你说这张的我很帅</p>",image:"image\\1 (5).jpg"},
+                    {text:"<p>2022 5 7</p>"},
+                    {text:"<p>你教我弹中阮</p>",image:"image\\1 (60).jpg"},
+                    {text:"<p>你为我过的第一个生日，这个礼物好像到最后都没有拼完</p>",image:"image\\1 (62).jpg"},
+                    {text:"<p>2022 5 27</p>"},
+                    {text:"<p>今天是校庆，这是我们表演前在舞蹈室的合照,这两张照片我真的好喜欢，我觉得这是我们最棒的合照</p>",image:"image\\1 (49).jpg"},
+                    {text:"<p> </p>",image:"image\\1 (50).jpg"},
+                    {text:"<p>偷拍你</p>",image:"image\\1 (47).jpg"},
+                    {text:"<p>2022 5 14</p>"},
+                    {text:"<p>我还记得那天结束之后下了好大的雨</p>"},
+                    {text:"<p>2022 5 29</p>"},
+                    {text:"<p>高一六班的傍晚，能和你一起读书，能在这样的美景下读书真好</p>",image:"image\\1 (63).jpg"},
+                    {text:"<p>2022 5 30</p>"},
+                    {text:"<p>那是一点也没有意识到高考会来的这么快，高考完之后的我们并不快乐</p>",image:"image\\1 (64).jpg"},
+                    {text:"<p>2022 1 2</p>"},
+                    {text:"<p>一起参加啊斌的生日</p>",image:"image\\1 (65).jpg"},
+                    {text:"<p>2022 10 3</p>"},
+                    {text:"<p>我和你玩的第一个剧本杀(还是我偷拍的你)</p>",image:"image\\1 (48).jpg"},
+                    {text:"<p>2022 10 27</p>"},
+                    {text:"<p>我们在一起的九中第二个运动会,这是你十佳歌手决赛闪闪发光的样子</p>",image:"image\\1 (66).jpg"},
+                    {text:"<p>你拿我的手机拍照，这些照片也是非常非常非常非常非常发好看</p>",image:"image\\1 (44).jpg"},
+                    {text:"<p></p>",image:"image\\1 (45).jpg"},
+                    {text:"<p></p>",image:"image\\1 (67).jpg"},
+                    {text:"<p>2022 11 5</p>"},
+                    {text:"<p>你说这是你最喜欢的一张照片</p>",image:"image\\1 (20).jpg"},
+                    {text:"<p>这是我最喜欢的一张照片</p>",image:"image\\1 (42).jpg"},
+                    {text:"<p>2022 11 29</p>"},
+                    {text:"<p>还是九中的天,真的好美</p>",image:"image\\1 (68).jpg"},
+                    ]
+            },
+            {
+                title:"2023",
+                content:[
+                    {text:"<p>2023 1 14</p>"},
+                    {text:"<p>这张照片好cool</p>",image:"image\\1 (41).jpg"},
+                    {text:"<p>2023 1 22</p>"},
+                    {text:"<p>这天晚上我饿了，大半夜的时候你在教我如何煎蛋(我好幸福啊)</p>",image:"image\\1 (69).jpg"},
+                    {text:"<p>2023 2 18</p>"},
+                    {text:"<p>你的手好白，好嫩啊,那时候一起牵着手回去的感觉真好</p>",image:"image\\1 (70).jpg"},
+                    {text:"<p>2023 4 1</p>"},
+                    {text:"<p>还是九中的天</p>",image:"image\\1 (71).jpg"},
+                    {text:"<p>2023 4 26</p>"},
+                    {text:"<p>今天，我们出发去研学了</p>",image:"image\\1 (74).jpg"},
+                    {text:"<p>我们在海边拍的第一张照片,当时说好以后高考完会一起来海边玩的</p>",image:"image\\1 (72).jpg"},
+                    {text:"<p></p>",image:"image\\1 (75).jpg"},
+                    {text:"<p>我们一起在海边看烟花</p>",image:"image\\1 (73).jpg"},
+                    {text:"<p>2023 5 2</p>"},
+                    {text:"<p>我们在路边拍的照片(我好后悔，为什么害怕，为什么不敢接受自己去和你多拍几张照片)</p>",image:"image\\1 (38).jpg"},
+                    {text:"<p>2023 5 2</p>"},
+                    {text:"<p>趁着五一放假，我们终于有时间出去玩了</p>",image:"image\\1 (36).jpg"},
+                    {text:"<p></p>",image:"image\\1 (37).jpg"},
+                    {text:"<p>2023 7 23</p>"},
+                    {text:"<p>晚上在手机上你拉着我看番,你说这部番很催泪,不过最后你好像没有看完</p>",image:"image\\1 (76).jpg"},
+                    {text:"<p>2023 7 30</p>"},
+                    {text:"<p>我们吵架了，冷战了好几天，这是我去找你的路上</p>",image:"image\\1 (77).jpg"},
+                    {text:"<p>2023 9 30</p>"},
+                    {text:"<p>国庆节放假了,我们出来玩了,我们一起去吃好吃的了</p>",image:"image\\1 (78).jpg"},
+                    {text:"<p></p>",image:"image\\1 (79).jpg"},
+                    {text:"<p>2023 10 12</p>"},
+                    {text:"<p>今天是九中成人礼</p>",image:"image\\1 (80).jpg"},
+                    {text:"<p>2023 12 30</p>"},
+                    {text:"<p>今天我们一起去吃自助餐了</p>",image:"image\\1 (81).jpg"},
+                    {text:"<p></p>",image:"image\\1 (34).jpg"},
+                    {text:"<p>今年就这样结束了....</p>"},
+                ]
+            },
+            {
+                title:"2024",
+                content:[
+                {text:"<p>2024 1 6</p>"},
+                {text:"<p>我去你出租屋找你,这是你家楼下的小猫（我还记得你好多次都对我说过以后想养小猫）</p>",image:"image\\1 (84).jpg"},
+                {text:"<p>2024 1 21</p>"},
+                {text:"<p>你为我买的奶茶</p>",image:"image\\1 (85).jpg"},
+                {text:"<p>2024 3 23</p>"},
+                {text:"<p>时间过得好快,高中三年就快结束了</p>",image:"image\\1 (82).jpg"},
+                {text:"<p>高考加油</p>",image:"image\\1 (83).jpg"},
+                {text:"<p>2024 5 1</p>"},
+                {text:"<p>又是五一,我们又一起出去玩了</p>",image:"image\\1 (33).jpg"},
+                {text:"<p>2024 5 14</p>"},
+                {text:"<p>今天是我最幸福的时光之一,你尽管生气却任然为我庆祝生日,我真的好开心,有要好朋友,有最爱我的女朋友,我从未如此开心过</p>",image:"image\\1 (86).jpg"},
+                {text:"<p>2024 7 17</p>"},
+                {text:"<p>你让我给妈妈带的蛋糕</p>",image:"image\\1 (88).jpg"},
+                {text:"<p>2024 7 25</p>"},
+                {text:"<p>我来给你补课啦</p>",image:"image\\1 (87).jpg"},
+                {text:"<p>2024 8 6</p>"},
+                {text:"<p>这张壁纸我已经用了两年了</p>",image:"image\\1 (89).jpg"},
+                {text:"<p>2024 8 6</p>"},
+                {text:"<p>我在你家教你写作业,那时候我好幸福,每天都可以看着你</p>",image:"image\\1 (90).jpg"},
+                {text:"<p>你家的窗外</p>",image:"image\\1 (96).jpg"},
+                {text:"<p>2024 8 7</p>"},
+                {text:"<p>教完你数学和你一起去拿快递的路上</p>",image:"image\\1 (91).jpg"},
+                {text:"<p>2024 8 11</p>"},
+                {text:"<p>我要去旅游了,你说把敢敢带上,就当作你和我一起旅游了</p>",image:"image\\1 (92).jpg"},
+                {text:"<p>2024 8 18</p>"},
+                {text:"<p>我又给你扎头发了</p>",image:"image\\1 (93).jpg"},
+                {text:"<p>2024 8 24<p>"},
+                {text:"<p>我们的三周年庆前一天,我们一起做了戒指</p>",image:"image\\1 (94).jpg"},
+                {text:"<p></p>",image:"image\\1 (1).jpg"},
+                {text:"<p>2024 8 25</p>"},
+                {text:"<p>我们的三周年庆</p>",image:"image\\1 (95).jpg"},
+                {text:"<p>2024 8 31</p>"},
+                {text:"<p>今天是我最难过的一天.....我要和你分开了，我们一起去私人影院看了电影，看完后一起去老地方吃了东西，我不舍，我不想，我不愿意见不到你，我想和你在一起，我从未想过那一天之后是我最后一次抱你.....我好想回到那个时候，如果我知道那一天是我最后一次见你，最后一次抱你，那我死都不离开.....</p>",image:"image\\1 (9).jpg"},
+                ]
+            },
+            {
+
+            }
+        ];
+        
+        let currentPage = 0;
+
+        // 显示下一个页面内容
+// 显示下一个页面内容
+function nextPage() {
+    currentPage = (currentPage + 1) % pages.length;
+    renderPage(currentPage);
+    setTimeout(scrollToTop, 10);  // 略微延迟，确保内容渲染完成后再滚动到顶部
+}
+
+// 显示上一个页面内容
+function previousPage() {
+    currentPage = (currentPage - 1 + pages.length) % pages.length;
+    renderPage(currentPage);
+    setTimeout(scrollToTop, 10);  // 略微延迟，确保内容渲染完成后再滚动到顶部
+}
+
+
+        // 渲染页面内容，支持多段文字和对应的图片
+        function renderPage(pageIndex) {
+            const page = pages[pageIndex];
+            let contentHTML = page.content.map(item => {
+                return `
+                    ${item.text}
+                    ${item.image ? `<img src="${item.image}" alt="图片" style="width: 100%; max-width: 600px; margin-top: 20px;">` : ''}
+                `;
+            }).join('');
+            document.getElementById('textbox').innerHTML = `
+                <h1>${page.title}</h1>
+                ${contentHTML}  <!-- 渲染页面的HTML内容和图片 -->
+            `;
+        }
+
+        // 滚动到文本框顶部
+// 滚动到文本框顶部
+function scrollToTop() {
+    const textbox = document.getElementById('textbox');
+    textbox.scrollTop = 0;  // 直接设置scrollTop为0，跳转到顶部
+}
+        // 生成雪花效果
+        function createSnowflakes() {
+            const snowflakesContainer = document.getElementById('snowflakes');
+            for (let i = 0; i < 30; i++) {  // 增加雪花数量
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.style.left = `${Math.random() * 100}vw`;
+                snowflake.style.top = `0px`;  /* 确保雪花从文本框顶部下落 */
+                snowflake.style.animationDuration = `${Math.random() * 5 + 5}s`;  // 每个雪花持续时间不同
+                snowflake.style.animationDelay = `${Math.random() * 5}s`;  // 每个雪花延迟时间不同
+                snowflakesContainer.appendChild(snowflake);
+            }
+        }
+
+        // 页面加载时生成雪花并渲染第一页
+        window.onload = function() {
+            createSnowflakes();
+            renderPage(currentPage);
+        };
+    </script>
+
+</body>
+</html>
